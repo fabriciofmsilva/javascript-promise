@@ -3,6 +3,10 @@ export const fetchHandler = res => {
   return res.json();
 };
 
+export const delay = time => data =>
+  new Promise((resolve, reject) =>
+    setTimeout(() => resolve(data), time));
+
 export const promiseWithTimeout = (promise, milliseconds) => {
   const timeout =  new Promise((resolve, reject) =>
     setTimeout(() => 
@@ -14,3 +18,11 @@ export const promiseWithTimeout = (promise, milliseconds) => {
     promise
   ]);
 };
+
+export const retry = (fn, retries = 3, time = 2000) =>
+  fn().catch(err => 
+    delay(time)().then(() => 
+      retries > 1
+        ? retry(fn, retries - 1, time)
+        : Promise.reject(err))
+  );
